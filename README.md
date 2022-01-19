@@ -44,33 +44,38 @@
 Create network
 
 ```sh
-$ docker network create --driver bridge postgres-network
+docker network create --driver bridge postgres-network
 ```
 
 - PosgresSQL
 Replace **_POSTGRES_PASSWORD_** to your postgres password and **_POSTGRES_FOLDER_PATH_** to your postgres local folder
 
 ```sh
-$ sudo docker run --name my-postgres --network=postgres-network -e "POSTGRES_PASSWORD=_POSTGRES_PASSWORD_" -p 5432:5432 -v _POSTGRES_FOLDER_PATH_:/var/lib/postgresql/data -d postgres
+docker run --name my-postgres --network=postgres-network -e "POSTGRES_PASSWORD=_POSTGRES_PASSWORD_" -p 5432:5432 -v _POSTGRES_FOLDER_PATH_:/var/lib/postgresql/data -d postgres
 ```
 
 Iterative mode
 
 ```sh
-$ docker exec -it my-postgres bash
+docker exec -it my-postgres bash
 ```
 
 - PG Admin
   Local url: localhost:8888
 Default user is **pgadmin@pgadmin.com** and password **pgadmin**
 ```sh
-$ sudo docker run --name my-pgadmin --network=postgres-network -p 8888:80 -e "PGADMIN_DEFAULT_EMAIL=pgadmin@pgadmin.com" -e "PGADMIN_DEFAULT_PASSWORD=pgadmin" -d dpage/pgadmin4
+docker run --name my-pgadmin --network=postgres-network -p 8888:80 -e "PGADMIN_DEFAULT_EMAIL=pgadmin@pgadmin.com" -e "PGADMIN_DEFAULT_PASSWORD=pgadmin" -d dpage/pgadmin4
+```
+
+### Apache
+```sh
+docker run -d -p 80:80 --name my-apache -v "$PWD":/var/www/html php:7.2-apache
 ```
 
 ### MySql
 
 ```sh
-$ docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql
+docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql
 ```
 
 ### Multiple SSH Keys settings for different account
@@ -78,7 +83,7 @@ $ docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql
 create different ssh key (with custom name)
 
 ```sh
-$ ssh-keygen
+ssh-keygen
 ```
 
 for example, keys created at:
@@ -90,14 +95,14 @@ for example, keys created at:
 get content of generated ssh key and add it to your git repository
 
 ```sh
-$ cat ~/.ssh/gitlab_key.pub
+cat ~/.ssh/gitlab_key.pub
 ```
 
 Modify the ssh config
 
 ```sh
-$ cd ~/.ssh/
-$ touch config
+cd ~/.ssh/
+touch config
 ```
 
 Then added
