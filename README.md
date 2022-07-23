@@ -78,6 +78,20 @@ docker run -d -p 80:80 --name my-apache -v "$PWD":/var/www/html php:7.2-apache
 docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql
 ```
 
+### Redis
+
+Create network
+
+```sh
+docker network create --driver bridge redis-network
+```
+
+- Redis
+
+```sh
+docker run --name my-redis --network=redis-network -p 6379:6379 -d redis
+```
+
 ### Multiple SSH Keys settings for different account
 
 create different ssh key (with custom name)
