@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: piholevm
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
+    ports:
+      - "PUBLIC_IP:53:53/tcp"
+      - "PUBLIC_IP:53:53/udp"
+      - "67:67/udp"
+      - "1010:80/tcp"
+    environment:
+      TZ: 'Europe/London'
+      WEBPASSWORD: 'PASSWORD'
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - vpn_network
+    restart: unless-stopped
+
+networks:
+  vpn_network:
+    driver: bridge
