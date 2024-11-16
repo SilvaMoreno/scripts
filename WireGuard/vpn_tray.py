@@ -8,10 +8,18 @@ VPN_CONNECTION_NAME = "wg0"  # WireGuard connection name in Network Manager
 
 def load_image(filename):
     """Load an image file and return an icon-compatible image."""
-    width = 64
-    height = 64
-    image = Image.open(filename)
-    return image.resize((width, height), Image.ANTIALIAS)
+    try:
+        # Obtém o diretório onde o script está localizado
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        # Cria o caminho absoluto para a imagem
+        image_full_path = os.path.join(script_dir, filename)
+        width = 64
+        height = 64
+        image = Image.open(image_full_path)
+        return image.resize((width, height))
+    except Exception as e:
+        print(f"Error loading image: {e}")
+        sys.exit(1)
 
 def is_vpn_connected():
     """Checks if the VPN is connected."""
