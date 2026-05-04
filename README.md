@@ -1,129 +1,77 @@
-<!-- PROJECT LOGO -->
-<br />
-<p align="center">
-  <a href="https://github.com/SilvaMoreno/scripts">
-    <!-- <img src="images/logo.png" alt="Logo" width="80" height="80"> -->
-    <h2 align="center">Dev scripts</h2>
-  </a>
+# Dev Scripts Repository
 
-  <p align="center">
-    Script for developers using linux
-    <br />
-    <a href="https://github.com/SilvaMoreno/scripts"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/SilvaMoreno/scripts/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/SilvaMoreno/scripts/issues">Request Feature</a>
-  </p>
-</p>
+Collection of utility scripts for developers using Linux environments.
 
-<!-- TABLE OF CONTENTS -->
-<details open="open">
-  <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
-  <ol>
-    <li>
-      <a href="#docker">Docker</a>
-      <ul>
-        <li><a href="#postgres">Postgres</a></li>
-        <li><a href="#mysql">Mysql</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#multiple-ssh-keys-settings-for-different-account">Multiple SSH Keys settings for different account</a>
-    </li>
-  </ol>
-</details>
-
-<!-- GETTING STARTED -->
-
-## Docker
-
-### Postgres
-
-Create network
-
-```sh
-docker network create --driver bridge postgres-network
-```
-
-- PosgresSQL
-Replace **_POSTGRES_PASSWORD_** to your postgres password and **_POSTGRES_FOLDER_PATH_** to your postgres local folder
-
-```sh
-docker run --name my-postgres --network=postgres-network -e "POSTGRES_PASSWORD=_POSTGRES_PASSWORD_" -p 5432:5432 -v _POSTGRES_FOLDER_PATH_:/var/lib/postgresql/data -d postgres
-```
-
-Iterative mode
-
-```sh
-docker exec -it my-postgres bash
-```
-
-- PG Admin
-  Local url: localhost:8888
-Default user is **pgadmin@pgadmin.com** and password **pgadmin**
-```sh
-docker run --name my-pgadmin --network=postgres-network -p 8888:80 -e "PGADMIN_DEFAULT_EMAIL=pgadmin@pgadmin.com" -e "PGADMIN_DEFAULT_PASSWORD=pgadmin" -d dpage/pgadmin4
-```
-
-### Apache
-```sh
-docker run -d -p 80:80 --name my-apache -v "$PWD":/var/www/html php:7.2-apache
-```
-
-### MySql
-
-```sh
-docker run --name my-mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql
-```
-
-### Redis
-
-Create network
-
-```sh
-docker network create --driver bridge redis-network
-```
-
-- Redis
-
-```sh
-docker run --name my-redis --network=redis-network -p 6379:6379 -d redis
-```
-
-### Multiple SSH Keys settings for different account
-
-create different ssh key (with custom name)
-
-```sh
-ssh-keygen
-```
-
-for example, keys created at:
-
-```sh
-~/.ssh/gitlab_key
-```
-
-get content of generated ssh key and add it to your git repository
-
-```sh
-cat ~/.ssh/gitlab_key.pub
-```
-
-Modify the ssh config
-
-```sh
-cd ~/.ssh/
-touch config
-```
-
-Then added
+## Structure
 
 ```
-Host [username].[github|gitlab].com
-	HostName [github|gitlab].com
-	PreferredAuthentications publickey
-	IdentityFile ~/.ssh/gitlab_key
+.
+├── docker/                    # Docker configurations
+│   ├── databases/            # Database containers
+│   │   ├── postgres/        # PostgreSQL + pgAdmin setup
+│   │   ├── mysql/           # MySQL setup
+│   │   └── redis/           # Redis setup
+│   ├── dns/                 # DNS-related containers
+│   │   └── pihole/         # Pi-hole ad blocker
+│   ├── vpn/                 # VPN configurations
+│   │   └── wireguard/      # WireGuard VPN server
+│   └── web/                 # Web server containers
+│       └── apache/          # Apache web server
+├── scripts/                  # Utility shell scripts
+│   └── setup/              # Environment setup scripts
+├── tools/                    # Standalone tools
+│   └── vpn-tray/           # VPN system tray application
+├── docs/                     # Documentation
+│   ├── git.md              # Git-related notes
+│   ├── linux.md            # Linux tips
+│   └── xdebug_lampp_vscode.md  # Xdebug + VSCode + LAMPP
+└── AGENTS.md                # Guidelines for AI agents
 ```
+
+## Quick Start
+
+### Prerequisites
+- Linux environment
+- Docker and Docker Compose installed
+- Python 3.x (for tools)
+
+### Running Docker Containers
+
+```bash
+# Make scripts executable
+chmod +x docker/databases/docker_containers.sh
+chmod +x docker/databases/postgres/docker_pgadmin.sh
+
+# Run database containers
+cd docker/databases
+./docker_containers.sh
+
+# Run pgAdmin (from postgres directory)
+cd docker/databases/postgres
+./docker_pgadmin.sh
+```
+
+### VPN Tray Tool
+
+```bash
+cd tools/vpn-tray
+pip install pystray pillow
+python3 vpn_tray.py
+```
+
+## Documentation
+
+Each directory contains its own README.md with specific instructions:
+
+- [Docker Overview](docker/README.md)
+- [Database Containers](docker/databases/README.md)
+- [WireGuard VPN](docker/vpn/wireguard/README.md)
+- [Pi-hole DNS](docker/dns/pihole/README.md)
+- [VPN Tray Tool](tools/vpn-tray/README.md)
+
+## Contributing
+
+1. Create feature branch
+2. Add scripts with proper documentation
+3. Update relevant README files
+4. Follow code style guidelines in [AGENTS.md](AGENTS.md)
