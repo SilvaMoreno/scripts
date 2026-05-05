@@ -26,6 +26,8 @@ This repository contains a collection of developer scripts for Linux environment
 ```
 
 ### Key Files
+- `docker/reverse-proxy/traefik/docker-compose.yml` - Traefik 2.11 reverse proxy
+- `docker/nextcloud/docker-compose.yml` - Nextcloud + PostgreSQL + Redis stack
 - `docker/databases/docker_containers.sh` - Main database container setup
 - `docker/vpn/wireguard/docker-compose.yml` - WireGuard VPN server
 - `tools/vpn-tray/vpn_tray.py` - VPN tray application

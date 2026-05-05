@@ -1,0 +1,90 @@
+# version: '3.8'
+
+services:
+  nextcloud:
+    image: nextcloud:32-apache
+    container_name: nextcloud
+    restart: unless-stopped
+    networks:
+      - traefik
+      - internal
+    depends_on:
+      - db
+      - redis
+    ports:
+      - 9001:80
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=${POSTGRES_USER:-nextcloud}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER:-admin}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_TRUSTED_DOMAINS:-cloud.example.com}
+      # - NEXTCLOUD_TRUSTED_PROXIES=172.16.0.0/12,10.0.0.0/8
+      - REDIS_HOST=redis
+      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
+      - OVERWRITEPROTOCOL=https
+      - OVERWRITECLIURL=https://cloud.example.com
+      - TRUSTED_PROXIES=172.19.0.0/16 10.0.0.0/8
+    volumes:
+      - ./data:/var/www/html/data
+      # - ./config:/var/www/html/config
+      - ./custom_apps:/var/www/html/custom_apps
+      - ./themes:/var/www/html/themes
+      - ./apache/servername.conf:/etc/apache2/conf-available/servername.conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`${NEXTCLOUD_TRUSTED_DOMAINS:-cloud.example.com}`)"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls.certresolver=myresolver"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      - "traefik.http.routers.nextcloud.middlewares=nextcloud_redirectregex"
+      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.permanent=true"
+      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.regex=https://(.*)/.well-known/(?:card|cal)dav"
+      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.replacement='https://$${1}/remote.php/dav"
+      # - "traefik.http.routers.nextcloud.middlewares=nextcloud-dedupe,nextcloud-caldav"
+      #- "traefik.http.middlewares.nextcloud-dedupe.redirectregex.regex=^https://(.*)/$"
+      #- "traefik.http.middlewares.nextcloud-dedupe.redirectregex.replacement=https://$$1"
+      #- "traefik.http.middlewares.nextcloud-dedupe.redirectregex.permanent=true"
+      #- "traefik.http.middlewares.nextcloud-caldav.redirectregex.regex=^https://(.*)/.well-known/(card|cal)dav"
+      #- "traefik.http.middlewares.nextcloud-caldav.redirectregex.replacement=https://$$1/remote.php/dav/"
+      #- "traefik.http.middlewares.nextcloud-caldav.redirectregex.permanent=true"
+
+  db:
+    image: postgres:16
+    container_name: nextcloud-db
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=${POSTGRES_USER:-nextcloud}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nextcloud}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: nextcloud-redis
+    restart: unless-stopped
+    networks:
+      - internal
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - ./redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  traefik:
+    external: true
+  internal:

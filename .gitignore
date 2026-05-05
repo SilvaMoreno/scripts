@@ -1,0 +1,42 @@
+# Environment variables (contain secrets)
+.env
+**/.env
+
+# Let's Encrypt certificates
+acme.json
+**/acme.json
+
+# Nextcloud data
+docker/nextcloud/data/
+**/data/
+
+# Database volumes (sensitive data)
+**/db_data/
+**/redis_data/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+**/*.log
+
+# Temporary files
+*.tmp
+*.bak
